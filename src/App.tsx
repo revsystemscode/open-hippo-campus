@@ -413,7 +413,7 @@ export default function App() {
     <div className="app">
       <header className="topbar">
         <div className="brand">
-          <img src="/app-icon.svg" alt="" width={28} height={28} />
+          <img src="/app-icon.png" alt="" width={28} height={28} />
           <span>Open Hippo Campus</span>
         </div>
         <EngineBadge status={engine} onRetry={refreshEngine} />

@@ -93,6 +93,16 @@ Añade una entrada a `src-tauri/catalog.json`:
 }
 ```
 
+## Icono
+
+El original está en [assets/app-icon.png](assets/app-icon.png) (1024×1024, con transparencia y sombra). Si lo cambias, regenera todos los tamaños para macOS y Windows con:
+
+```bash
+pnpm tauri icon assets/app-icon.png && rm -rf src-tauri/icons/android src-tauri/icons/ios
+```
+
+El logo de la cabecera de la app es [public/app-icon.png](public/app-icon.png), una copia de 128 px.
+
 ## Limitaciones conocidas de la PoC
 
 - Necesita un motor Docker ya instalado. Todavía no crea su propia VM.
