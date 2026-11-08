@@ -414,7 +414,7 @@ export default function App() {
       <header className="topbar">
         <div className="brand">
           <img src="/app-icon.png" alt="" width={28} height={28} />
-          <span>Open Hippo Campus</span>
+          <span>Open Hippocampus</span>
         </div>
         <EngineBadge status={engine} onRetry={refreshEngine} />
       </header>

@@ -1,4 +1,4 @@
-//! Open Hippo Campus — PoC de gestor local de servicios en contenedores.
+//! Open Hippocampus — PoC de gestor local de servicios en contenedores.
 //!
 //! Comandos expuestos al frontend (React) mediante `invoke`.
 

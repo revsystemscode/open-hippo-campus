@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Open Hippocampus</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script>
+      // Carga la interfaz real con datos de ejemplo en lugar del backend de Tauri.
+      // Solo se usa para generar las capturas del README (ver capture.mjs).
+      // Vistas: ?view=services | catalog | containers | logs
+      const view = new URLSearchParams(location.search).get("view") || "services";
+
+      const catalog = [
+        { id: "redis", name: "Redis", category: "Cache / clave-valor", description: "Almacén en memoria para caché, colas y sesiones.", image: "redis:7-alpine", ports: [{ container: 6379, label: "Redis" }], webUi: null },
+        { id: "postgres", name: "PostgreSQL", category: "Base de datos SQL", description: "Base de datos relacional con base 'app' y usuario 'dev'.", image: "postgres:17-alpine", ports: [{ container: 5432, label: "PostgreSQL" }], webUi: null },
+        { id: "mysql", name: "MySQL", category: "Base de datos SQL", description: "MySQL 8.4 LTS con base 'app' y usuario 'dev'.", image: "mysql:8.4", ports: [{ container: 3306, label: "MySQL" }], webUi: null },
+        { id: "mongo", name: "MongoDB", category: "Base de datos documental", description: "MongoDB 8 con usuario administrador 'dev'.", image: "mongo:8", ports: [{ container: 27017, label: "MongoDB" }], webUi: null },
+        { id: "rabbitmq", name: "RabbitMQ", category: "Mensajería", description: "Broker AMQP con panel web de administración.", image: "rabbitmq:4-management-alpine", ports: [{ container: 5672, label: "AMQP" }, { container: 15672, label: "Panel web" }], webUi: "x" },
+        { id: "minio", name: "MinIO", category: "Almacenamiento S3", description: "Almacenamiento de objetos compatible con S3 (usuario 'dev').", image: "minio/minio:latest", ports: [{ container: 9000, label: "API S3" }, { container: 9001, label: "Consola web" }], webUi: "x" },
+      ];
+
+      const containers = [
+        { id: "a1", name: "ohc-postgres", image: "postgres:17-alpine", state: "running", status: "Up 12 minutes (healthy)", health: "healthy", ports: [{ privatePort: 5432, publicPort: 5432 }], created: 5, managed: true, serviceId: "postgres", serviceName: "PostgreSQL", connection: "postgres://dev:k7Fq2mWxP9tRb4NcZs8L@localhost:5432/app", webUi: null, composeProject: null },
+        { id: "a2", name: "ohc-redis", image: "redis:7-alpine", state: "running", status: "Up 12 minutes (healthy)", health: "healthy", ports: [{ privatePort: 6379, publicPort: 6379 }], created: 4, managed: true, serviceId: "redis", serviceName: "Redis", connection: "redis://:Hn3vYq8LcT2wZk5RpM7d@localhost:6379", webUi: null, composeProject: null },
+        { id: "a3", name: "ohc-rabbitmq", image: "rabbitmq:4-management-alpine", state: "running", status: "Up 8 seconds (health: starting)", health: "starting", ports: [{ privatePort: 5672, publicPort: 5672 }, { privatePort: 15672, publicPort: 15672 }], created: 3, managed: true, serviceId: "rabbitmq", serviceName: "RabbitMQ", connection: "amqp://dev:Bw6sJx4NqR9tLm2KcV8z@localhost:5672", webUi: "http://localhost:15672", composeProject: null },
+        { id: "b1", name: "mi-api-web-1", image: "node:22-alpine", state: "running", status: "Up 3 hours", health: null, ports: [{ privatePort: 3000, publicPort: 3000 }], created: 2, managed: false, serviceId: null, serviceName: null, connection: null, webUi: null, composeProject: "mi-api" },
+        { id: "b2", name: "mi-api-worker-1", image: "node:22-alpine", state: "exited", status: "Exited (0) 2 hours ago", health: null, ports: [], created: 1, managed: false, serviceId: null, serviceName: null, connection: null, webUi: null, composeProject: "mi-api" },
+      ];
+
+      const engine = { connected: true, endpoint: "/var/run/docker.sock", provider: "OrbStack", serverVersion: "29.8.2", os: "OrbStack", kernel: "7.2.12-orbstack", arch: "x86_64", cpus: 8, memoryBytes: 8 * 1024 ** 3, containers: 5, running: 4, images: 9, error: null, tried: [] };
+
+      const logs = [
+        "2026-11-08 13:27:41.012 UTC [1] LOG:  starting PostgreSQL 17.6 on x86_64-pc-linux-musl",
+        '2026-11-08 13:27:41.012 UTC [1] LOG:  listening on IPv4 address "0.0.0.0", port 5432',
+        '2026-11-08 13:27:41.013 UTC [1] LOG:  listening on IPv6 address "::", port 5432',
+        '2026-11-08 13:27:41.017 UTC [1] LOG:  listening on Unix socket "/var/run/postgresql/.s.PGSQL.5432"',
+        "2026-11-08 13:27:41.024 UTC [57] LOG:  database system was shut down at 2026-11-08 13:27:40 UTC",
+        "2026-11-08 13:27:41.031 UTC [1] LOG:  database system is ready to accept connections",
+        "2026-11-08 13:32:41.124 UTC [55] LOG:  checkpoint starting: time",
+        "2026-11-08 13:32:45.310 UTC [55] LOG:  checkpoint complete: wrote 44 buffers (0.3%); 0 WAL file(s) added",
+      ].join("\n") + "\n";
+
+      // Sustituto mínimo de los internos de Tauri que usa @tauri-apps/api.
+      const callbacks = {};
+      let nextId = 0;
+      window.__TAURI_EVENT_PLUGIN_INTERNALS__ = { unregisterListener() {} };
+      window.__TAURI_INTERNALS__ = {
+        transformCallback: (cb) => {
+          const id = ++nextId;
+          callbacks[id] = cb;
+          return id;
+        },
+        invoke: async (cmd, args) => {
+          if (cmd === "engine_status") return engine;
+          if (cmd === "catalog_list") return catalog;
+          if (cmd === "containers_list") return containers;
+          if (cmd === "container_logs") return logs;
+          if (cmd === "plugin:event|listen") {
+            window.__emitProgress = (p) => callbacks[args.handler]({ event: "service-progress", id: 1, payload: p });
+            return 1;
+          }
+          if (cmd === "service_create") return new Promise(() => {}); // se queda "descargando"
+          return null;
+        },
+      };
+
+      const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+      const click = (sel, text) => [...document.querySelectorAll(sel)].find((b) => b.textContent.includes(text)).click();
+      const showMongoDownload = async () => {
+        click(".btn-primary", "MongoDB");
+        await wait(100);
+        window.__emitProgress({ serviceId: "mongo", phase: "pull", message: "Descargando mongo:8 · 312.4 / 498.7 MB", percent: 63 });
+      };
+
+      window.addEventListener("load", async () => {
+        await wait(400);
+        if (view === "services") await showMongoDownload();
+        if (view === "catalog") {
+          document.querySelector(".content").scrollTop = 10000;
+          await showMongoDownload();
+        }
+        if (view === "containers") click(".tab", "Todos");
+        if (view === "logs") click(".btn", "Logs");
+        document.body.dataset.ready = "true";
+      });
+    </script>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

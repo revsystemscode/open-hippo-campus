@@ -1,6 +1,6 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "Open Hippo Campus",
+  "productName": "Open Hippocampus",
   "version": "0.1.0",
   "identifier": "dev.rev.openhippocampus",
   "build": {
@@ -13,7 +13,7 @@
     "windows": [
       {
         "label": "main",
-        "title": "Open Hippo Campus",
+        "title": "Open Hippocampus",
         "width": 1180,
         "height": 780,
         "minWidth": 860,

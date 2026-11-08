@@ -2,7 +2,7 @@
   <img src="docs/images/logo-banner.jpg" alt="Open Hippocampus" width="720" />
 </p>
 
-# Open Hippo Campus (PoC)
+# Open Hippocampus (PoC)
 
 App de escritorio para crear y gestionar servicios locales en contenedores (Redis, PostgreSQL, MySQL, MongoDB, RabbitMQ, MinIO) con un clic.
 
@@ -26,7 +26,11 @@ Es la **fase 0** del plan descrito en [analisis-orbstack.md](analisis-orbstack.m
 
 ![Visor de logs](docs/images/screenshot-logs.png)
 
-> Las capturas usan datos de ejemplo.
+> Las capturas usan datos de ejemplo. Para regenerarlas, con `pnpm dev` corriendo y Google Chrome instalado:
+>
+> ```bash
+> node scripts/screenshots/capture.mjs
+> ```
 
 ## Stack
 
