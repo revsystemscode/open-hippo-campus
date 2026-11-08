@@ -1,8 +1,32 @@
+<p align="center">
+  <img src="docs/images/logo-banner.jpg" alt="Open Hippocampus" width="720" />
+</p>
+
 # Open Hippo Campus (PoC)
 
 App de escritorio para crear y gestionar servicios locales en contenedores (Redis, PostgreSQL, MySQL, MongoDB, RabbitMQ, MinIO) con un clic.
 
 Es la **fase 0** del plan descrito en [analisis-orbstack.md](analisis-orbstack.md): la app se conecta a un motor Docker que ya esté corriendo (OrbStack, Docker Desktop, Colima o Rancher Desktop). En una fase posterior levantará su propia VM (Lima en macOS, WSL2 en Windows).
+
+## Capturas
+
+**Mis servicios.** Cada servicio muestra su estado, sus puertos y su cadena de conexión, lista para copiar.
+
+![Servicios gestionados por la app](docs/images/screenshot-services.png)
+
+**Catálogo.** Un clic crea el servicio. Mientras descarga la imagen se ve el progreso.
+
+![Catálogo de servicios con descarga en curso](docs/images/screenshot-catalog.png)
+
+**Todos los contenedores.** Incluye también los que no creó la app, como los de proyectos con Docker Compose.
+
+![Lista de todos los contenedores](docs/images/screenshot-containers.png)
+
+**Logs** de cualquier contenedor, actualizados en vivo.
+
+![Visor de logs](docs/images/screenshot-logs.png)
+
+> Las capturas usan datos de ejemplo.
 
 ## Stack
 
