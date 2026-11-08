@@ -1,0 +1,101 @@
+[
+  {
+    "id": "redis",
+    "name": "Redis",
+    "category": "Cache / clave-valor",
+    "description": "Almacén en memoria para caché, colas y sesiones.",
+    "image": "redis:7-alpine",
+    "ports": [{ "container": 6379, "label": "Redis" }],
+    "env": {},
+    "cmd": ["redis-server", "--requirepass", "{{password}}", "--appendonly", "yes"],
+    "dataPath": "/data",
+    "healthcheck": ["CMD", "redis-cli", "--no-auth-warning", "-a", "{{password}}", "ping"],
+    "connection": "redis://:{{password}}@localhost:{{port.6379}}"
+  },
+  {
+    "id": "postgres",
+    "name": "PostgreSQL",
+    "category": "Base de datos SQL",
+    "description": "Base de datos relacional con base 'app' y usuario 'dev'.",
+    "image": "postgres:17-alpine",
+    "ports": [{ "container": 5432, "label": "PostgreSQL" }],
+    "env": {
+      "POSTGRES_USER": "dev",
+      "POSTGRES_PASSWORD": "{{password}}",
+      "POSTGRES_DB": "app"
+    },
+    "dataPath": "/var/lib/postgresql/data",
+    "healthcheck": ["CMD-SHELL", "pg_isready -U dev -d app"],
+    "connection": "postgres://dev:{{password}}@localhost:{{port.5432}}/app"
+  },
+  {
+    "id": "mysql",
+    "name": "MySQL",
+    "category": "Base de datos SQL",
+    "description": "MySQL 8.4 LTS con base 'app' y usuario 'dev'.",
+    "image": "mysql:8.4",
+    "ports": [{ "container": 3306, "label": "MySQL" }],
+    "env": {
+      "MYSQL_ROOT_PASSWORD": "{{password}}",
+      "MYSQL_DATABASE": "app",
+      "MYSQL_USER": "dev",
+      "MYSQL_PASSWORD": "{{password}}"
+    },
+    "dataPath": "/var/lib/mysql",
+    "healthcheck": ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -udev -p{{password}} --silent"],
+    "connection": "mysql://dev:{{password}}@localhost:{{port.3306}}/app"
+  },
+  {
+    "id": "mongo",
+    "name": "MongoDB",
+    "category": "Base de datos documental",
+    "description": "MongoDB 8 con usuario administrador 'dev'.",
+    "image": "mongo:8",
+    "ports": [{ "container": 27017, "label": "MongoDB" }],
+    "env": {
+      "MONGO_INITDB_ROOT_USERNAME": "dev",
+      "MONGO_INITDB_ROOT_PASSWORD": "{{password}}"
+    },
+    "dataPath": "/data/db",
+    "healthcheck": ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping')"],
+    "connection": "mongodb://dev:{{password}}@localhost:{{port.27017}}/?authSource=admin"
+  },
+  {
+    "id": "rabbitmq",
+    "name": "RabbitMQ",
+    "category": "Mensajería",
+    "description": "Broker AMQP con panel web de administración.",
+    "image": "rabbitmq:4-management-alpine",
+    "ports": [
+      { "container": 5672, "label": "AMQP" },
+      { "container": 15672, "label": "Panel web" }
+    ],
+    "env": {
+      "RABBITMQ_DEFAULT_USER": "dev",
+      "RABBITMQ_DEFAULT_PASS": "{{password}}"
+    },
+    "dataPath": "/var/lib/rabbitmq",
+    "healthcheck": ["CMD", "rabbitmq-diagnostics", "-q", "ping"],
+    "connection": "amqp://dev:{{password}}@localhost:{{port.5672}}",
+    "webUi": "http://localhost:{{port.15672}}"
+  },
+  {
+    "id": "minio",
+    "name": "MinIO",
+    "category": "Almacenamiento S3",
+    "description": "Almacenamiento de objetos compatible con S3 (usuario 'dev').",
+    "image": "minio/minio:latest",
+    "ports": [
+      { "container": 9000, "label": "API S3" },
+      { "container": 9001, "label": "Consola web" }
+    ],
+    "env": {
+      "MINIO_ROOT_USER": "dev",
+      "MINIO_ROOT_PASSWORD": "{{password}}"
+    },
+    "cmd": ["server", "/data", "--console-address", ":9001"],
+    "dataPath": "/data",
+    "connection": "http://localhost:{{port.9000}}  (access key: dev / secret: {{password}})",
+    "webUi": "http://localhost:{{port.9001}}"
+  }
+]
